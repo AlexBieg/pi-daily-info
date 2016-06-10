@@ -1,10 +1,58 @@
 @import url(https://fonts.googleapis.com/css?family=Roboto+Slab:400,300);
 @import url(https://fonts.googleapis.com/css?family=Josefin+Slab:400,300,700);
 
+html, body {
+    margin: 0px;
+    height: 100%;
+}
+
 body {
+    background-image: url("img/sky.jpeg");
+    background-repeat: no-repeat;
+    background-size: cover;
+    color: white;
+}
+
+a {
+    color: white;
+}
+
+a:hover {
+    text-decoration: none;
+    color: gray;
+}
+
+body, h3 {
     font-family: "Roboto Slab";
+    font-weight: 300;
+}
+
+h1, h2 {
+    font-family: "Josefin Slab"
+}
+
+h2 {
+    font-size: 50px;
 }
 
 #authorize {
     display: none;
+}
+
+.event-list, .email-list, .news-list {
+    list-style: none;
+}
+
+.event-list li {
+    font-size: 20px;
+    color: white;
+}
+
+.email-list h3 {
+    margin-bottom: 5px;
+}
+
+.email-list p {
+    margin-top: 0px;
+    color: #cecece;
 }

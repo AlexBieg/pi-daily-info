@@ -4,7 +4,13 @@
         <meta charset="utf-8">
         <title>Daily Info</title>
 
+        <!-- Jquery -->
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+
+        <!-- Bootstrap -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+
         <script type="text/javascript" src="script.js"></script>
         <script src="https://apis.google.com/js/client.js?onload=checkAuth"></script>
 
@@ -14,10 +20,24 @@
         <div>
             <button id="authorize">Authorize</button>
         </div>
-        <div class="content">
+        <div class="content container">
             <div class="calendar">
-                <h2>Today's Events</h2>
-                <ul class="response">
+                <h2><a href="http://calendar.google.com">Today's Events</a></h2>
+                <ul class="event-list"></ul>
+            </div>
+            <div class="weather">
+                <h2>Weather</h2>
+                <div class="current-weather">
+
+                </div>
+            </div>
+            <div>
+                <h2><a href="http://inbox.google.com">Emails</a></h2>
+                <ul class="email-list"></ul>
+            </div>
+            <div class="news">
+                <h2><a href="https://news.google.com/news/section?cf=all&pz=1&topic=tc&siidp=d5eaf867de0c5cc02f89124d7993ca720b4d&ict=ln">News</a></h2>
+                <ul class="news-list">
 
                 </ul>
             </div>

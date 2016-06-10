@@ -2,7 +2,7 @@
 // Developer Console, https://console.developers.google.com
 var CLIENT_ID = '492257460870-9hevog7tfv04aqtmflp58eu2th5vst0o.apps.googleusercontent.com';
 
-var SCOPES = ["https://www.googleapis.com/auth/calendar.readonly"];
+var SCOPES = ["https://www.googleapis.com/auth/calendar.readonly", "https://www.googleapis.com/auth/gmail.readonly"];
 
 /**
 * Check if current user has authorized this application.
@@ -26,11 +26,13 @@ function handleAuthResult(authResult) {
     if (authResult && !authResult.error) {
       // Hide auth UI, then load client library.
       authorizeBtn.hide();
-      loadCalendarApi();
+      $('.content').show();
+      loadApis();
     } else {
       // Show auth UI, allowing the user to initiate authorization by
       // clicking authorize button.
       authorizeBtn.show();
+      $('.content').hide();
     }
 }
 
@@ -50,8 +52,51 @@ function handleAuthClick(event) {
 * Load Google Calendar client library. List upcoming events
 * once client library is loaded.
 */
-function loadCalendarApi() {
+function loadApis() {
     gapi.client.load('calendar', 'v3', listUpcomingEvents);
+    gapi.client.load('gmail', 'v1', listEmails);
+}
+
+
+function listEmails() {
+    var request = gapi.client.gmail.users.messages.list({
+        'userId': 'me',
+        'maxResults': 5,
+        'q': 'is:unread'
+    });
+
+    request.execute(function(resp) {
+        var messages = resp.messages;
+        for (var i = 0; i < messages.length; i++) {
+            var messageRequest = gapi.client.gmail.users.messages.get({
+                'userId': 'me',
+                'id' : messages[i].id
+            });
+
+            messageRequest.execute(function(message) {
+                var headers = message.payload.headers;
+                var fromAddress = "";
+                var title = "";
+                for (var j = 0; j < headers.length; j++) {
+                    if (headers[j].name == "From") {
+                        console.log(headers[j].value);
+                        fromAddress = headers[j].value;
+                    } else if (headers[j].name == 'Subject') {
+                        title = headers[j].value;
+                    }
+                }
+                appendEmail(fromAddress, title);
+            });
+        }
+    });
+}
+
+function appendEmail(fromAddress, title) {
+    var li = $("<li>");
+    li.append($("<h3>").text(title));
+    li.append($("<p>").text(fromAddress));
+
+    $('.email-list').append(li);
 }
 
 /**
@@ -63,7 +108,7 @@ function listUpcomingEvents() {
     var today = new Date();
     var endOfToday = new Date();
     endOfToday.setHours(23, 59, 59, 999);
-    
+
     var request = gapi.client.calendar.events.list({
       'calendarId': 'primary',
       'timeMin': today.toISOString(),
@@ -79,15 +124,29 @@ function listUpcomingEvents() {
 
       if (events.length > 0) {
         for (i = 0; i < events.length; i++) {
-          var event = events[i];
-          var when = event.start.dateTime;
-          if (!when) {
-            when = event.start.date;
-          }
-          append(event.summary + ' (' + when + ')')
+            var event = events[i];
+            var when = event.start.dateTime;
+            if (!when) {
+                when = event.start.date;
+            }
+            var whenDate = new Date(when);
+            var formattedHours = whenDate.getHours();
+            var dayPeriod = "AM";
+            if (whenDate.getHours() > 12){
+                formattedHours = whenDate.getHours() - 12;
+                if (whenDate.getHours() != 24 || whenDate.getHours() != 0 || whenDate.getHours() == 12) {
+                    dayPeriod = "PM"
+                }
+            }
+            var formattedMinutes = whenDate.getMinutes()+"";
+            if (formattedMinutes.length < 2) {
+                formattedMinutes = "0" + formattedMinutes;
+            }
+            var formatedTime = formattedHours + ":" + formattedMinutes + " " + dayPeriod;
+            appendEvent(formatedTime + ': ' + event.summary, event.htmlLink);
         }
       } else {
-        append('No upcoming events found.');
+        appendEvent('No upcoming events found.', '#');
       }
 
     });
@@ -99,11 +158,33 @@ function listUpcomingEvents() {
 *
 * @param {string} message Text to be placed in pre element.
 */
-function append(message) {
-    var list = $('.response');
+function appendEvent(message, link) {
+    var list = $('.event-list');
     var item = $('<li>');
-    item.text(message);
+    var linkTag = $('<a>');
+    var text = $('<h3>');
+    text.text(message);
+    linkTag.attr('href', link);
+    linkTag.append(text);
+    item.append(linkTag);
     list.append(item);
+}
+
+function loadNews() {
+  //   $.ajax({
+  //   url: "https://news.google.com/news?cf=all&hl=en&pz=1&ned=us&topic=tc&output=rss",
+  //   jsonp: "callback",
+  //
+  //   // tell jQuery we're expecting JSONP
+  //   dataType: "jsonp",
+  //   success: function( response ) {
+  //     console.log(response);
+  //   }
+  // });
+}
+
+function loadWeather() {
+    
 }
 
 
@@ -111,4 +192,7 @@ $(function() {
     $("#authorize").click(function() {
         handleAuthClick();
     });
+
+    loadNews();
+    loadWeather();
 });
