@@ -307,10 +307,61 @@ function listUpcomingEvents() {
                     formattedMinutes = "0" + formattedMinutes;
                 }
                 var formatedTime = formattedHours + ":" + formattedMinutes + " " + dayPeriod;
-                appendEvent(formatedTime + ': ' + event.summary, event.htmlLink);
+                appendEvent(formatedTime + ': ' + event.summary, event.htmlLink, $('.today-event-list'));
             }
         } else {
-            appendEvent('No upcoming events found.', '#');
+            appendEvent('No events found.', '#', $('.today-event-list'));
+        }
+
+    });
+
+    var tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(0, 0, 0, 0);
+    var nextDay = new Date();
+    nextDay.setDate(tomorrow.getDate());
+    nextDay.setHours(23, 59, 59, 999);
+    console.log(tomorrow);
+    console.log(nextDay);
+
+    var requestTomorrow = gapi.client.calendar.events.list({
+        'calendarId': 'primary',
+        'timeMin': tomorrow.toISOString(),
+        'timeMax': nextDay.toISOString(),
+        'showDeleted': false,
+        'singleEvents': true,
+        'maxResults': 10,
+        'orderBy': 'startTime'
+    });
+
+    requestTomorrow.execute(function(resp) {
+        var events = resp.items;
+
+        if (events.length > 0) {
+            for (i = 0; i < events.length; i++) {
+                var event = events[i];
+                var when = event.start.dateTime;
+                if (!when) {
+                    when = event.start.date;
+                }
+                var whenDate = new Date(when);
+                var formattedHours = whenDate.getHours();
+                var dayPeriod = "AM";
+                if (whenDate.getHours() > 12) {
+                    formattedHours = whenDate.getHours() - 12;
+                    if (whenDate.getHours() != 24 || whenDate.getHours() != 0 || whenDate.getHours() == 12) {
+                        dayPeriod = "PM"
+                    }
+                }
+                var formattedMinutes = whenDate.getMinutes() + "";
+                if (formattedMinutes.length < 2) {
+                    formattedMinutes = "0" + formattedMinutes;
+                }
+                var formatedTime = formattedHours + ":" + formattedMinutes + " " + dayPeriod;
+                appendEvent(formatedTime + ': ' + event.summary, event.htmlLink, $('.tomorrow-event-list'));
+            }
+        } else {
+            appendEvent('No upcoming events found.', '#', $('.tomorrow-event-list'));
         }
 
     });
@@ -322,8 +373,7 @@ function listUpcomingEvents() {
  *
  * @param {string} message Text to be placed in pre element.
  */
-function appendEvent(message, link) {
-    var list = $('.event-list');
+function appendEvent(message, link, list) {
     var item = $('<li>');
     var linkTag = $('<a>');
     var text = $('<h3>');
