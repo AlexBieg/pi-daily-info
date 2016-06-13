@@ -4,6 +4,158 @@ var CLIENT_ID = '492257460870-9hevog7tfv04aqtmflp58eu2th5vst0o.apps.googleuserco
 
 var SCOPES = ["https://www.googleapis.com/auth/calendar.readonly", "https://www.googleapis.com/auth/gmail.readonly"];
 
+var currentWeatherData = null;
+var futureWeatherData = null;
+var chartLoaded = false;
+
+Date.prototype.addHours = function(h) {
+    this.setHours(this.getHours() + h);
+    return this;
+}
+
+google.charts.load('current', {
+    packages: ['corechart', 'line']
+});
+google.charts.setOnLoadCallback(chartCallback);
+
+function chartCallback() {
+    chartLoaded = true;
+    drawWeather();
+}
+
+function drawWeather() {
+    if (chartLoaded && currentWeatherData != null && futureWeatherData != null) {
+        //Draw Current Weather Graph
+        var today = new Date();
+        console.log(today.getMonth());
+
+        var data = new google.visualization.DataTable();
+        data.addColumn('datetime', 'X');
+        data.addColumn('number', 'Temp');
+        data.addColumn('number', 'Precipitation');
+        for (var i = 0; i < currentWeatherData.length; i++) {
+            var date = new Date(today.getFullYear(), today.getMonth(), today.getDate(), today.getHours() + i, today.getMinutes(), today.getSeconds(), today.getMilliseconds());
+            data.addRows([
+                [date, currentWeatherData[i].apparentTemperature, currentWeatherData.precipProbability * 100]
+            ]);
+        }
+
+        var currentOptions = {
+            hAxis: {
+                title: 'Time',
+                logScale: false,
+                textStyle: {
+                    color: "#FFFFFF"
+                },
+                titleTextStyle: {
+                    color: "#FFFFFF"
+                },
+                color: "#FFFFFF",
+                gridlines: {
+                    count: -1,
+                    units: {
+                        days: {
+                            format: ['MMM dd']
+                        },
+                        hours: {
+                            format: ['HH:mm', 'ha']
+                        },
+                    }
+                },
+            },
+            vAxis: {
+                title: 'Degrees',
+                logScale: false,
+                textStyle: {
+                    color: "#FFFFFF"
+                },
+                titleTextStyle: {
+                    color: "#FFFFFF"
+                },
+                color: "#FFFFFF",
+                baseLineColor: "#FFFFFF"
+            },
+            colors: ['#FFFFFF', '#9BACFF'],
+            backgroundColor: {
+                fill: 'transparent'
+            },
+            legendTextStyle: {
+                color: '#FFFFFF'
+            },
+            titleTextStyle: {
+                color: '#FFFFFF'
+            },
+        };
+        var chart = new google.visualization.LineChart(document.getElementById('current-weather-graph'));
+        chart.draw(data, currentOptions);
+
+
+        //Draw Week Graph
+        var today = new Date();
+
+        var data = new google.visualization.DataTable();
+        data.addColumn('date', 'X');
+        data.addColumn('number', 'Temp');
+        data.addColumn('number', 'Precipitation');
+        for (var i = 0; i < futureWeatherData.length; i++) {
+            var date = new Date(today.getFullYear(), today.getMonth(), today.getDate() + i, 0, today.getMinutes(), today.getSeconds(), today.getMilliseconds());
+            data.addRows([
+                [date, futureWeatherData[i].apparentTemperatureMax, futureWeatherData.precipProbability * 100]
+            ]);
+        }
+
+        var currentOptions = {
+            hAxis: {
+                title: 'Time',
+                logScale: false,
+                textStyle: {
+                    color: "#FFFFFF"
+                },
+                titleTextStyle: {
+                    color: "#FFFFFF"
+                },
+                color: "#FFFFFF",
+                gridlines: {
+                    count: -1,
+                    units: {
+                        days: {
+                            format: ['MMM dd']
+                        },
+                        hours: {
+                            format: ['HH:mm', 'ha']
+                        },
+                    }
+                },
+            },
+            vAxis: {
+                title: 'Degrees',
+                logScale: false,
+                textStyle: {
+                    color: "#FFFFFF"
+                },
+                titleTextStyle: {
+                    color: "#FFFFFF"
+                },
+                color: "#FFFFFF",
+                baseLineColor: "#FFFFFF"
+            },
+            colors: ['#FFFFFF', '#9BACFF'],
+            backgroundColor: {
+                fill: 'transparent'
+            },
+            legendTextStyle: {
+                color: '#FFFFFF'
+            },
+            titleTextStyle: {
+                color: '#FFFFFF'
+            },
+        };
+        var chart = new google.visualization.LineChart(document.getElementById('future-weather-graph'));
+        chart.draw(data, currentOptions);
+    }
+}
+
+
 /**
  * Check if current user has authorized this application.
  */
@@ -186,12 +338,41 @@ function loadNews() {
 }
 
 function loadWeather(pos) {
-    $.getJSON("https://api.forecast.io/forecast/c8a59ebce21645ec34d8dd31d21d15e2/" + pos.lat + "," + pos.lng + "?callback=?", function(response) {
+    // $.getJSON("https://api.forecast.io/forecast/c8a59ebce21645ec34d8dd31d21d15e2/" + pos.lat + "," + pos.lng + "?callback=?", function(response)
+    $.getJSON("https://api.forecast.io/forecast/c8a59ebce21645ec34d8dd31d21d15e2/47.6062,-122.3321?callback=?", function(response) {
         console.log(response);
+
+        var options = {
+            hAxis: {
+                title: "Hour",
+                logScale: false
+            },
+            vAxis: {
+                title: "Temp",
+                logScale: false
+            }
+        };
+
         //add current weather
         var currentP = $("<p>");
         currentP.text(response.hourly.summary);
         $(".current-weather").append(currentP);
+        currentWeatherData = response.hourly.data;
+
+        // var currentData = google.visualization.DrawTable();
+        // currentData.addColumn("number", "Today");
+        // for (var i = 0; i < response.hourly.data.length; i++) {
+        //     currentData.addRow(response.hourly.data.apparentTemprature);
+        // }
+        // var currentChart = new google.visualization.LineChart(document.getElementById('current-weather-graph'));
+        // currentChart.draw(currentData, options);
+
+
+        var futureP = $("<p>");
+        futureP.text(response.daily.summary);
+        $(".future-weather").append(futureP);
+        futureWeatherData = response.daily.data;
+
     })
 }
 

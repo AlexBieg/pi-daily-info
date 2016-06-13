@@ -11,6 +11,9 @@
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
 
+        <!-- Google Charts -->
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
         <script type="text/javascript" src="script.js"></script>
         <script src="https://apis.google.com/js/client.js?onload=checkAuth"></script>
 
@@ -26,12 +29,15 @@
                 <ul class="event-list"></ul>
             </div>
             <div class="weather">
-                <h2>Weather</h2>
+                <h2><a href="http://forcast.io">Weather</a></h2>
                 <div class="all-weather">
-                    <h3>Currently</h3>
+                    <h3>Today</h3>
                     <div class="current-weather"></div>
+                    <div id="current-weather-graph"></div>
+
                     <h3>Daily</h3>
                     <div class="future-weather"></div>
+                    <div id="future-weather-graph"></div>
                 </div>
             </div>
             <div>
