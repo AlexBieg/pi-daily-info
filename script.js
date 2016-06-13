@@ -36,7 +36,7 @@ function drawWeather() {
         for (var i = 0; i < currentWeatherData.length; i++) {
             var date = new Date(today.getFullYear(), today.getMonth(), today.getDate(), today.getHours() + i, today.getMinutes(), today.getSeconds(), today.getMilliseconds());
             data.addRows([
-                [date, currentWeatherData[i].apparentTemperature, currentWeatherData.precipProbability * 100]
+                [date, currentWeatherData[i].apparentTemperature, currentWeatherData[i].precipProbability * 100]
             ]);
         }
 
@@ -73,7 +73,11 @@ function drawWeather() {
                     color: "#FFFFFF"
                 },
                 color: "#FFFFFF",
-                baseLineColor: "#FFFFFF"
+                baseLineColor: "#FFFFFF",
+                viewWindowMode: 'explicit',
+                viewWindow: {
+                    min: 0
+                }
             },
             colors: ['#FFFFFF', '#9BACFF'],
             backgroundColor: {
@@ -85,6 +89,7 @@ function drawWeather() {
             titleTextStyle: {
                 color: '#FFFFFF'
             },
+            pointSize: 5
         };
         var chart = new google.visualization.LineChart(document.getElementById('current-weather-graph'));
         chart.draw(data, currentOptions);
@@ -100,7 +105,7 @@ function drawWeather() {
         for (var i = 0; i < futureWeatherData.length; i++) {
             var date = new Date(today.getFullYear(), today.getMonth(), today.getDate() + i, 0, today.getMinutes(), today.getSeconds(), today.getMilliseconds());
             data.addRows([
-                [date, futureWeatherData[i].apparentTemperatureMax, futureWeatherData.precipProbability * 100]
+                [date, futureWeatherData[i].apparentTemperatureMax, futureWeatherData[i].precipProbability * 100]
             ]);
         }
 
@@ -137,7 +142,11 @@ function drawWeather() {
                     color: "#FFFFFF"
                 },
                 color: "#FFFFFF",
-                baseLineColor: "#FFFFFF"
+                baseLineColor: "#FFFFFF",
+                viewWindowMode: 'explicit',
+                viewWindow: {
+                    min: 0
+                }
             },
             colors: ['#FFFFFF', '#9BACFF'],
             backgroundColor: {
@@ -149,6 +158,7 @@ function drawWeather() {
             titleTextStyle: {
                 color: '#FFFFFF'
             },
+            pointSize: 5
         };
         var chart = new google.visualization.LineChart(document.getElementById('future-weather-graph'));
         chart.draw(data, currentOptions);
@@ -324,49 +334,51 @@ function appendEvent(message, link) {
     list.append(item);
 }
 
+function displayNews(response) {
+    console.log(response);
+    var newsList = $(".news-list");
+    $(".news-source").text(response.responseData.feed.description);
+    var entries = response.responseData.feed.entries;
+    for (var i = 0; i < entries.length; i++) {
+        var item = $('<li>');
+
+        var title = $('<h3>');
+        title.text(entries[i].title)
+
+        var link = $('<a>');
+        link.attr('href', entries[i].link);
+        link.append(title);
+
+        var content = $('<p>');
+        content.html(entries[i].contentSnippet);
+        item.append(link);
+        item.append(content);
+        newsList.append(item);
+    }
+}
+
 function loadNews() {
-    //   $.ajax({
-    //   url: "https://news.google.com/news?cf=all&hl=en&pz=1&ned=us&topic=tc&output=rss",
-    //   jsonp: "callback",
-    //
-    //   // tell jQuery we're expecting JSONP
-    //   dataType: "jsonp",
-    //   success: function( response ) {
-    //     console.log(response);
-    //   }
-    // });
+    $.ajax({
+        url: 'http://ajax.googleapis.com/ajax/services/feed/load?v=1.0&num=8&q=http%3A%2F%2Fnews.google.com%2Fnews%3Foutput%3Drss&callback=displayNews',
+        type: "GET",
+        dataType: 'jsonp',
+        jsonp: 'displayNews',
+        async: 'true',
+        success: function(response) {
+
+        }
+    });
 }
 
 function loadWeather(pos) {
-    // $.getJSON("https://api.forecast.io/forecast/c8a59ebce21645ec34d8dd31d21d15e2/" + pos.lat + "," + pos.lng + "?callback=?", function(response)
-    $.getJSON("https://api.forecast.io/forecast/c8a59ebce21645ec34d8dd31d21d15e2/47.6062,-122.3321?callback=?", function(response) {
+    $.getJSON("https://api.forecast.io/forecast/c8a59ebce21645ec34d8dd31d21d15e2/" + pos.lat + "," + pos.lng + "?callback=?", function(response) {
         console.log(response);
-
-        var options = {
-            hAxis: {
-                title: "Hour",
-                logScale: false
-            },
-            vAxis: {
-                title: "Temp",
-                logScale: false
-            }
-        };
 
         //add current weather
         var currentP = $("<p>");
         currentP.text(response.hourly.summary);
         $(".current-weather").append(currentP);
         currentWeatherData = response.hourly.data;
-
-        // var currentData = google.visualization.DrawTable();
-        // currentData.addColumn("number", "Today");
-        // for (var i = 0; i < response.hourly.data.length; i++) {
-        //     currentData.addRow(response.hourly.data.apparentTemprature);
-        // }
-        // var currentChart = new google.visualization.LineChart(document.getElementById('current-weather-graph'));
-        // currentChart.draw(currentData, options);
-
 
         var futureP = $("<p>");
         futureP.text(response.daily.summary);
@@ -384,7 +396,6 @@ function findLocation() {
                 lat: position.coords.latitude,
                 lng: position.coords.longitude
             };
-            console.log(pos);
             loadWeather(pos);
         }, function() {
             console.log("Error");
@@ -402,5 +413,5 @@ $(function() {
         handleAuthClick();
     });
 
-    //loadNews();
+    loadNews();
 });
