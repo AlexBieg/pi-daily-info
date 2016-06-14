@@ -446,8 +446,8 @@ function findLocation() {
                 lng: position.coords.longitude
             };
             loadWeather(pos);
-        }, function() {
-            console.log("Error");
+        }, function(error) {
+            console.log(error);
         });
     } else {
         // Browser doesn't support Geolocation
