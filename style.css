@@ -1,11 +1,9 @@
 @import url(https://fonts.googleapis.com/css?family=Roboto+Slab:400,300);
 @import url(https://fonts.googleapis.com/css?family=Josefin+Slab:400,300,700);
-
 html, body {
     margin: 0px;
     height: 100%;
 }
-
 body {
     background-image: url("img/sky.jpeg");
     background-repeat: no-repeat;
@@ -14,68 +12,63 @@ body {
     background-attachment: fixed;
     color: white;
 }
-
 a {
     color: white;
 }
-
 a:hover {
     text-decoration: none;
     color: gray;
 }
-
 a:visited {
     text-decoration: none;
     color: white;
 }
-
 p {
-    font-size: 20px;
+    font-size: 18px;
 }
-
 h3 {
     font-size: 23px;
 }
-
 body, h3 {
     font-family: "Roboto Slab";
     font-weight: 300;
 }
-
 h1, h2 {
     font-family: "Josefin Slab"
 }
-
 h2 {
     font-size: 50px;
 }
-
 #authorize {
     display: none;
 }
-
 .tomorrow-event-list, .today-event-list, .email-list, .news-list {
     list-style: none;
 }
-
 li {
     margin-bottom: 50px;
 }
 
+.calendar li {
+    margin-bottom: 10px;
+}
 .event-list li {
     font-size: 20px;
     color: white;
 }
-
 .email-list h3 {
     margin-bottom: 5px;
 }
-
-.email-list p {
+.email-list p, .news-list p {
     margin-top: 0px;
     color: #E5E5E5;
 }
-
 .all-weather {
     padding-left: 40px;
+}
+button {
+    background-color: #9BACFF;
+    margin-left: 40%;
+    width: 20%;
+    margin-top: 40px;;
 }

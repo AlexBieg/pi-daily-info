@@ -55,7 +55,7 @@ function drawWeather() {
                     count: -1,
                     units: {
                         days: {
-                            format: ['MMM dd']
+                            format: ['EEE']
                         },
                         hours: {
                             format: ['HH:mm', 'ha']
@@ -124,7 +124,7 @@ function drawWeather() {
                     count: -1,
                     units: {
                         days: {
-                            format: ['MMM dd']
+                            format: ['EEE, MMM dd']
                         },
                         hours: {
                             format: ['HH:mm', 'ha']
@@ -387,7 +387,6 @@ function appendEvent(message, link, list) {
 function displayNews(response) {
     console.log(response);
     var newsList = $(".news-list");
-    $(".news-source").text(response.responseData.feed.description);
     var entries = response.responseData.feed.entries;
     for (var i = 0; i < entries.length; i++) {
         var item = $('<li>');
